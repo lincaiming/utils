@@ -90,10 +90,10 @@ def process_voc_xml(data_dir, output_dir):
             cls = obj.find("name").text
             os.makedirs(os.path.join(output_dir, cls), exist_ok=True)
             bbox = obj.find("bndbox")
-            xmin = int(bbox.find("xmin").text)
-            ymin = int(bbox.find("ymin").text)
-            xmax = int(bbox.find("xmax").text)
-            ymax = int(bbox.find("ymax").text)
+            xmin = min(max(int(float(bbox.find("xmin").text)), 0), width - 1)
+            ymin = min(max(int(float(bbox.find("ymin").text)), 0), height - 1)
+            xmax = min(max(int(float(bbox.find("xmax").text)), 0), width - 1)
+            ymax = min(max(int(float(bbox.find("ymax").text)), 0), height - 1)
             cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (255, 255, 255), thickness=2)
             cv2.putText(img, cls, (xmin, ymin), cv2.FONT_HERSHEY_COMPLEX, 0.7, (0, 255, 0),
                        thickness=2)

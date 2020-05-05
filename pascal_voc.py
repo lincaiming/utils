@@ -17,7 +17,7 @@ class Writer:
         abspath = os.path.abspath(path)
 
         self.template_parameters = {
-            'path': abspath,
+            # 'path': abspath,
             'filename': os.path.basename(abspath),
             'folder': os.path.basename(os.path.dirname(abspath)),
             'width': width,
@@ -70,11 +70,14 @@ def process_voc_xml(data_dir, output_dir):
     xml_dir = os.path.join(data_dir, "Annotations")
 
     for item in os.listdir(xml_dir):
+
         anno_file = os.path.join(data_dir, "Annotations", item)
         jpeg_file = os.path.join(data_dir, "JPEGImages", os.path.splitext(item)[0] + ".jpg")
         if not os.path.exists(jpeg_file):
             print(jpeg_file)
+            continue
         tree = ET.parse(anno_file)
+        print(anno_file)
 
         image_name = tree.find("filename").text
         width = int(tree.findall("./size/width")[0].text)
@@ -87,10 +90,10 @@ def process_voc_xml(data_dir, output_dir):
         for obj in tree.findall('object'):
             cls = obj.find("name").text
             bbox = obj.find("bndbox")
-            xmin = int(bbox.find("xmin").text)
-            ymin = int(bbox.find("ymin").text)
-            xmax = int(bbox.find("xmax").text)
-            ymax = int(bbox.find("ymax").text)
+            xmin = min(max(int(float(bbox.find("xmin").text)), 0), width - 1)
+            ymin = min(max(int(float(bbox.find("ymin").text)), 0), height - 1)
+            xmax = min(max(int(float(bbox.find("xmax").text)), 0), width - 1)
+            ymax = min(max(int(float(bbox.find("ymax").text)), 0), height - 1)
 
             writer.addObject(cls, xmin, ymin, xmax, ymax)
 
